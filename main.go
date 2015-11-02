@@ -30,10 +30,10 @@ import (
 )
 
 const (
-	NS    = 1024 // number of samples
-	CZ    = 2    // bytes/1-sample for al.FormatMono16
+	NS    = 256 // number of samples
+	CZ    = 2   // bytes/1-sample for al.FormatMono16
 	Fmt   = al.FormatMono16
-	QUEUE = 3
+	QUEUE = 8
 )
 
 var (

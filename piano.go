@@ -11,12 +11,13 @@ func New(freqs []float32) *Piano {
 	envelopes := []Oscilator{}
 	for i, f := range freqs {
 		osc := Multiplex(
-			G(0.4, GenOscilator(f)),   // base sin wave
-			G(0.1, GenOscilator(f+2)), // vibrate effect
-			G(0.2, GenOscilator(f*2)), // 2 times freq
-			G(0.1, GenOscilator(f*4)), // 3 times freq
+			G(0.4, GenOscilator(f)),    // base sin wave
+			G(0.2, GenOscilator(f+2)),  // vibrate effect
+			G(0.2, GenOscilator(f*2)),  // 2 times freq
+			G(0.1, GenOscilator(f*3)),  // 3 times freq
+			G(0.05, GenOscilator(f*4)), // 4 times freq
 		)
-		envelopes = append(envelopes, G(0.5, GenEnvelope(&p.notes[i], osc)))
+		envelopes = append(envelopes, G(0.4, GenEnvelope(&p.notes[i], osc)))
 	}
 	p.oscilator = Multiplex(envelopes...) // all note oscilator multiplex
 	return p

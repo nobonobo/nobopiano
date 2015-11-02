@@ -42,8 +42,8 @@ func GenEnvelope(press *bool, f Oscilator) Oscilator {
 	attackd := dt / 0.01
 	dekeyd := dt / 0.03
 	sustainlevel := float32(0.3)
-	sustaind := dt / 5.0
-	released := dt / 0.5
+	sustaind := dt / 7.0
+	released := dt / 0.8
 	return func() float32 {
 		if *press {
 			if !top {
