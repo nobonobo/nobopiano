@@ -27,6 +27,8 @@ import (
 	"golang.org/x/mobile/exp/sprite/clock"
 	"golang.org/x/mobile/exp/sprite/glsprite"
 	"golang.org/x/mobile/gl"
+
+	"github.com/nobonobo/nobopiano/model"
 )
 
 const (
@@ -74,12 +76,12 @@ func hit2key(x, y float32) int {
 
 type Context struct {
 	sync.RWMutex
-	source    al.Source
-	queue     []al.Buffer
-	oscilator Oscilator
+	source     al.Source
+	queue      []al.Buffer
+	oscillator model.Oscillator
 }
 
-func NewContext(oscilator Oscilator) *Context {
+func NewContext(oscillator model.Oscillator) *Context {
 	if err := al.OpenDevice(); err != nil {
 		log.Fatal(err)
 	}
@@ -87,12 +89,10 @@ func NewContext(oscilator Oscilator) *Context {
 	if code := al.Error(); code != 0 {
 		log.Fatalln("openal error:", code)
 	}
-	//s[0].SetGain(s[0].MaxGain())
-	//s[0].SetPosition(al.ListenerPosition())
 	return &Context{
-		source:    s[0],
-		queue:     []al.Buffer{},
-		oscilator: oscilator,
+		source:     s[0],
+		queue:      []al.Buffer{},
+		oscillator: oscillator,
 	}
 }
 
@@ -110,7 +110,7 @@ func (c *Context) Play() {
 		b := al.GenBuffers(1)
 		buf := make([]byte, NS*CZ)
 		for n := 0; n < NS*CZ; n += CZ {
-			f := c.oscilator()
+			f := c.oscillator()
 			if f < -1.0 {
 				f = -1.0
 			}
@@ -140,7 +140,7 @@ func (c *Context) Close() {
 }
 
 func main() {
-	pianoPlayer := New([]float32{
+	pianoPlayer := model.NewPiano([]float32{
 		246.941650628,
 		261.625565301,
 		277.182630977,
@@ -168,7 +168,7 @@ func main() {
 					//fmt.Println("CrossOn")
 					glctx, _ = e.DrawContext.(gl.Context)
 					onStart(glctx)
-					pctx = NewContext(pianoPlayer.GetOscilator())
+					pctx = NewContext(pianoPlayer.GetOscillator())
 					a.Send(paint.Event{})
 				case lifecycle.CrossOff:
 					//fmt.Println("CrossOff")
@@ -177,6 +177,7 @@ func main() {
 					glctx = nil
 				}
 			case size.Event:
+				log.Println(e)
 				sz = e
 			case paint.Event:
 				if glctx == nil || e.External {
