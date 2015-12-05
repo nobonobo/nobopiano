@@ -1,16 +1,26 @@
-package main
+package model
 
-import "golang.org/x/mobile/exp/f32"
+import (
+	"math"
 
-type Oscilator func() float32
+	"golang.org/x/mobile/exp/f32"
+)
 
-func G(gain float32, f Oscilator) Oscilator {
+var SampleRate = 22050
+
+const (
+	Pi = float32(math.Pi)
+)
+
+type Oscillator func() float32
+
+func G(gain float32, f Oscillator) Oscillator {
 	return func() float32 {
 		return gain * f()
 	}
 }
 
-func Multiplex(fs ...Oscilator) Oscilator {
+func Multiplex(fs ...Oscillator) Oscillator {
 	return func() float32 {
 		res := float32(0)
 		for _, osc := range fs {
@@ -20,10 +30,10 @@ func Multiplex(fs ...Oscilator) Oscilator {
 	}
 }
 
-func GenOscilator(freq float32) Oscilator {
+func GenOscillator(freq float32) Oscillator {
+	dt := 1.0 / float32(SampleRate)
 	k := 2.0 * Pi * freq
 	T := 1.0 / freq
-	dt := 1.0 / float32(SampleRate)
 	t := float32(0.0)
 	return func() float32 {
 		res := f32.Sin(k * t)
@@ -35,15 +45,15 @@ func GenOscilator(freq float32) Oscilator {
 	}
 }
 
-func GenEnvelope(press *bool, f Oscilator) Oscilator {
+func GenEnvelope(press *bool, f Oscillator) Oscillator {
+	dt := 1.0 / float32(SampleRate)
 	top := false
 	gain := float32(0.0)
-	dt := 1.0 / float32(SampleRate)
 	attackd := dt / 0.01
 	dekeyd := dt / 0.03
 	sustainlevel := float32(0.3)
-	sustaind := dt / 5.0
-	released := dt / 0.5
+	sustaind := dt / 7.0
+	released := dt / 0.8
 	return func() float32 {
 		if *press {
 			if !top {
