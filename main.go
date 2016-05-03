@@ -186,7 +186,7 @@ func main() {
 				onPaint(glctx)
 				a.Publish()
 				pctx.Play()
-				repaint(a) // keep animating
+				a.Send(paint.Event{})
 			case touch.Event:
 				key := hit2key(e.X, e.Y)
 				old, ok := lastSeq[e.Sequence]
